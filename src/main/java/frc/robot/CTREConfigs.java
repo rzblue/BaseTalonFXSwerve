@@ -3,6 +3,8 @@ package frc.robot;
 import com.ctre.phoenix6.configs.CANcoderConfiguration;
 import com.ctre.phoenix6.configs.TalonFXConfiguration;
 
+import frc.lib.math.Conversions;
+
 public final class CTREConfigs {
     public TalonFXConfiguration swerveAngleFXConfig = new TalonFXConfiguration();
     public TalonFXConfiguration swerveDriveFXConfig = new TalonFXConfiguration();
@@ -38,7 +40,7 @@ public final class CTREConfigs {
         swerveDriveFXConfig.MotorOutput.NeutralMode = Constants.Swerve.driveNeutralMode;
 
         /* Gear Ratio Config */
-        swerveDriveFXConfig.Feedback.SensorToMechanismRatio = Constants.Swerve.driveGearRatio;
+        //swerveDriveFXConfig.Feedback.SensorToMechanismRatio = Constants.Swerve.driveGearRatio;
 
         /* Current Limiting */
         swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable = Constants.Swerve.driveEnableCurrentLimit;
@@ -50,6 +52,11 @@ public final class CTREConfigs {
         swerveDriveFXConfig.Slot0.kP = Constants.Swerve.driveKP;
         swerveDriveFXConfig.Slot0.kI = Constants.Swerve.driveKI;
         swerveDriveFXConfig.Slot0.kD = Constants.Swerve.driveKD;
+
+        swerveDriveFXConfig.Slot0.kS = Constants.Swerve.driveKS;
+        // VS/m * m/r_w / (r_m/r_w) = VS/r_m
+        swerveDriveFXConfig.Slot0.kA = Constants.Swerve.driveKA * Conversions.rotationsToMeters(1, Constants.Swerve.wheelCircumference) / Constants.Swerve.driveGearRatio;
+        swerveDriveFXConfig.Slot0.kV = Constants.Swerve.driveKV * Conversions.rotationsToMeters(1, Constants.Swerve.wheelCircumference) / Constants.Swerve.driveGearRatio;
 
         /* Open and Closed Loop Ramping */
         swerveDriveFXConfig.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = Constants.Swerve.openLoopRamp;
