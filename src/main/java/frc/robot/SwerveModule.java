@@ -1,5 +1,7 @@
 package frc.robot;
 
+import com.ctre.phoenix6.configs.CANcoderConfiguration;
+import com.ctre.phoenix6.configs.TalonFXConfiguration;
 import com.ctre.phoenix6.controls.DutyCycleOut;
 import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
@@ -30,21 +32,91 @@ public class SwerveModule {
 
     public SwerveModule(int moduleNumber, SwerveModuleConstants moduleConstants){
         this.moduleNumber = moduleNumber;
-        this.angleOffset = moduleConstants.angleOffset;
+        this.angleOffset = moduleConstants.angleOffset();
         
         /* Angle Encoder Config */
-        angleEncoder = new CANcoder(moduleConstants.cancoderID);
-        angleEncoder.getConfigurator().apply(Robot.ctreConfigs.swerveCANcoderConfig);
+        angleEncoder = new CANcoder(moduleConstants.cancoderID());
+        angleEncoder.getConfigurator().apply(getEncoderConfig());
 
         /* Angle Motor Config */
-        mAngleMotor = new TalonFX(moduleConstants.angleMotorID);
-        mAngleMotor.getConfigurator().apply(Robot.ctreConfigs.swerveAngleFXConfig);
+        mAngleMotor = new TalonFX(moduleConstants.angleMotorID());
+        mAngleMotor.getConfigurator().apply(getTurnMotorConfig());
         resetToAbsolute();
 
         /* Drive Motor Config */
-        mDriveMotor = new TalonFX(moduleConstants.driveMotorID);
-        mDriveMotor.getConfigurator().apply(Robot.ctreConfigs.swerveDriveFXConfig);
+        mDriveMotor = new TalonFX(moduleConstants.driveMotorID());
+        mDriveMotor.getConfigurator().apply(getDriveMotorConfig());
         mDriveMotor.getConfigurator().setPosition(0.0);
+    }
+
+    private TalonFXConfiguration getDriveMotorConfig() {
+        var config = new TalonFXConfiguration();
+        /* Motor Inverts and Neutral Mode */
+        config.MotorOutput.Inverted = Constants.Swerve.driveMotorInvert;
+        config.MotorOutput.NeutralMode = Constants.Swerve.driveNeutralMode;
+
+        /* Gear Ratio Config */
+        //swerveDriveFXConfig.Feedback.SensorToMechanismRatio = Constants.Swerve.driveGearRatio;
+
+        /* Current Limiting */
+        config.CurrentLimits.SupplyCurrentLimitEnable = Constants.Swerve.driveEnableSupplyCurrentLimit;
+        config.CurrentLimits.SupplyCurrentLimit = Constants.Swerve.driveSupplyCurrentLimit;
+        config.CurrentLimits.SupplyCurrentLowerLimit = Constants.Swerve.driveSupplyCurrentLower;
+        config.CurrentLimits.SupplyCurrentLowerTime = Constants.Swerve.driveSupplyCurrentLowerTime;
+
+        config.CurrentLimits.StatorCurrentLimit = Constants.Swerve.driveStatorCurrentLimit;
+        config.CurrentLimits.StatorCurrentLimitEnable = Constants.Swerve.driveEnableStatorCurrentLimit;
+
+        /* PID Config */
+        config.Slot0.kP = Constants.Swerve.driveKP;
+        config.Slot0.kI = Constants.Swerve.driveKI;
+        config.Slot0.kD = Constants.Swerve.driveKD;
+
+        config.Slot0.kS = Constants.Swerve.driveKS;
+        // VS/m * m/r_w / (r_m/r_w) = VS/r_m
+        config.Slot0.kA = Constants.Swerve.driveKA * Conversions.rotationsToMeters(1, Constants.Swerve.wheelCircumference) / Constants.Swerve.driveGearRatio;
+        config.Slot0.kV = Constants.Swerve.driveKV * Conversions.rotationsToMeters(1, Constants.Swerve.wheelCircumference) / Constants.Swerve.driveGearRatio;
+
+        /* Open and Closed Loop Ramping */
+        config.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = Constants.Swerve.openLoopRamp;
+        config.OpenLoopRamps.VoltageOpenLoopRampPeriod = Constants.Swerve.openLoopRamp;
+
+        config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = Constants.Swerve.closedLoopRamp;
+        config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = Constants.Swerve.closedLoopRamp;
+        return config;
+    }
+
+    private TalonFXConfiguration getTurnMotorConfig() {
+        var config = new TalonFXConfiguration();
+        /* Motor Inverts and Neutral Mode */
+        config.MotorOutput.Inverted = Constants.Swerve.angleMotorInvert;
+        config.MotorOutput.NeutralMode = Constants.Swerve.angleNeutralMode;
+
+        /* Gear Ratio and Wrapping Config */
+        config.Feedback.SensorToMechanismRatio = Constants.Swerve.angleGearRatio;
+        config.ClosedLoopGeneral.ContinuousWrap = true;
+        
+        /* Current Limiting */
+        config.CurrentLimits.SupplyCurrentLimitEnable = Constants.Swerve.angleEnableSupplyCurrentLimit;
+        config.CurrentLimits.SupplyCurrentLimit = Constants.Swerve.angleSupplyCurrentLimit;
+        config.CurrentLimits.SupplyCurrentLowerLimit = Constants.Swerve.angleSupplyCurrentLower;
+        config.CurrentLimits.SupplyCurrentLowerTime = Constants.Swerve.angleSupplyCurrentLowerTime;
+
+        config.CurrentLimits.StatorCurrentLimit = Constants.Swerve.angleStatorCurrentLimit;
+        config.CurrentLimits.StatorCurrentLimitEnable = Constants.Swerve.angleEnableStatorCurrentLimit;
+
+        /* PID Config */
+        config.Slot0.kP = Constants.Swerve.angleKP;
+        config.Slot0.kI = Constants.Swerve.angleKI;
+        config.Slot0.kD = Constants.Swerve.angleKD;
+
+        return config;
+    }
+
+    private CANcoderConfiguration getEncoderConfig() {
+        var config = new CANcoderConfiguration();
+        config.MagnetSensor.SensorDirection = Constants.Swerve.cancoderInvert;
+        return config;
     }
 
     public void setDesiredState(SwerveModuleState desiredState, boolean isOpenLoop){
