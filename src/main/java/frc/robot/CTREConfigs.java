@@ -24,10 +24,13 @@ public final class CTREConfigs {
         swerveAngleFXConfig.ClosedLoopGeneral.ContinuousWrap = true;
         
         /* Current Limiting */
-        swerveAngleFXConfig.CurrentLimits.SupplyCurrentLimitEnable = Constants.Swerve.angleEnableCurrentLimit;
-        swerveAngleFXConfig.CurrentLimits.SupplyCurrentLimit = Constants.Swerve.angleCurrentLimit;
-        swerveAngleFXConfig.CurrentLimits.SupplyCurrentLowerLimit = Constants.Swerve.angleCurrentThreshold;
-        swerveAngleFXConfig.CurrentLimits.SupplyCurrentLowerTime = Constants.Swerve.angleCurrentThresholdTime;
+        swerveAngleFXConfig.CurrentLimits.SupplyCurrentLimitEnable = Constants.Swerve.angleEnableSupplyCurrentLimit;
+        swerveAngleFXConfig.CurrentLimits.SupplyCurrentLimit = Constants.Swerve.angleSupplyCurrentLimit;
+        swerveAngleFXConfig.CurrentLimits.SupplyCurrentLowerLimit = Constants.Swerve.angleSupplyCurrentLower;
+        swerveAngleFXConfig.CurrentLimits.SupplyCurrentLowerTime = Constants.Swerve.angleSupplyCurrentLowerTime;
+
+        swerveAngleFXConfig.CurrentLimits.StatorCurrentLimit = Constants.Swerve.angleStatorCurrentLimit;
+        swerveAngleFXConfig.CurrentLimits.StatorCurrentLimitEnable = Constants.Swerve.angleEnableStatorCurrentLimit;
 
         /* PID Config */
         swerveAngleFXConfig.Slot0.kP = Constants.Swerve.angleKP;
@@ -43,10 +46,13 @@ public final class CTREConfigs {
         //swerveDriveFXConfig.Feedback.SensorToMechanismRatio = Constants.Swerve.driveGearRatio;
 
         /* Current Limiting */
-        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable = Constants.Swerve.driveEnableCurrentLimit;
-        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = Constants.Swerve.driveCurrentLimit;
-        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLowerLimit = Constants.Swerve.driveCurrentThreshold;
-        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLowerTime = Constants.Swerve.driveCurrentThresholdTime;
+        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimitEnable = Constants.Swerve.driveEnableSupplyCurrentLimit;
+        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLimit = Constants.Swerve.driveSupplyCurrentLimit;
+        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLowerLimit = Constants.Swerve.driveSupplyCurrentLower;
+        swerveDriveFXConfig.CurrentLimits.SupplyCurrentLowerTime = Constants.Swerve.driveSupplyCurrentLowerTime;
+
+        swerveDriveFXConfig.CurrentLimits.StatorCurrentLimit = Constants.Swerve.driveStatorCurrentLimit;
+        swerveDriveFXConfig.CurrentLimits.StatorCurrentLimitEnable = Constants.Swerve.driveEnableStatorCurrentLimit;
 
         /* PID Config */
         swerveDriveFXConfig.Slot0.kP = Constants.Swerve.driveKP;

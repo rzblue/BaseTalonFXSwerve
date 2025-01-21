@@ -49,15 +49,19 @@ public final class Constants {
         public static final SensorDirectionValue cancoderInvert = chosenModule.cancoderInvert;
 
         /* Swerve Current Limiting */
-        public static final int angleCurrentLimit = 25;
-        public static final int angleCurrentThreshold = 40;
-        public static final double angleCurrentThresholdTime = 0.1;
-        public static final boolean angleEnableCurrentLimit = true;
+        public static final int angleSupplyCurrentLimit = 25;
+        public static final int angleSupplyCurrentLower = 40;
+        public static final double angleSupplyCurrentLowerTime = 0.1;
+        public static final boolean angleEnableSupplyCurrentLimit = true;
+        public static final double angleStatorCurrentLimit = 80;
+        public static final boolean angleEnableStatorCurrentLimit = true;
 
-        public static final int driveCurrentLimit = 35;
-        public static final int driveCurrentThreshold = 60;
-        public static final double driveCurrentThresholdTime = 0.1;
-        public static final boolean driveEnableCurrentLimit = true;
+        public static final int driveSupplyCurrentLimit = 35;
+        public static final int driveSupplyCurrentLower = 60;
+        public static final double driveSupplyCurrentLowerTime = 0.1;
+        public static final boolean driveEnableSupplyCurrentLimit = true;
+        public static final double driveStatorCurrentLimit = 60;
+        public static final boolean driveEnableStatorCurrentLimit = true;
 
         /* These values are used by the drive falcon to ramp in open loop and closed loop driving.
          * We found a small open loop ramp (0.25) helps with tread wear, tipping, etc */
