@@ -4,9 +4,9 @@ import static edu.wpi.first.math.MathUtil.applyDeadband;
 import static frc.robot.Constants.*;
 
 import edu.wpi.first.wpilibj2.command.Command;
+import edu.wpi.first.wpilibj2.command.Commands;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import frc.robot.autos.*;
 import frc.robot.subsystems.*;
 
 /**
@@ -55,7 +55,6 @@ public class RobotContainer {
    * @return the command to run in autonomous
    */
   public Command getAutonomousCommand() {
-    // An ExampleCommand will run in autonomous
-    return new exampleAuto(s_Swerve);
+    return Commands.none();
   }
 }
