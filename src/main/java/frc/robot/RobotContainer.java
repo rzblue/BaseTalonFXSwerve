@@ -1,14 +1,13 @@
 package frc.robot;
 
-import edu.wpi.first.wpilibj.XboxController;
+import static edu.wpi.first.math.MathUtil.applyDeadband;
+import static frc.robot.Constants.*;
+
 import edu.wpi.first.wpilibj2.command.Command;
 import edu.wpi.first.wpilibj2.command.InstantCommand;
 import edu.wpi.first.wpilibj2.command.button.CommandXboxController;
-import static edu.wpi.first.math.MathUtil.applyDeadband;
-
 import frc.robot.autos.*;
 import frc.robot.subsystems.*;
-import static frc.robot.Constants.*;
 
 /**
  * This class is where the bulk of the robot should be declared. Since Command-based is a
@@ -17,27 +16,26 @@ import static frc.robot.Constants.*;
  * subsystems, commands, and trigger mappings) should be declared here.
  */
 public class RobotContainer {
-    /* Controllers */
-    private final CommandXboxController driver = new CommandXboxController(ControlConstants.driverPort);
+  /* Controllers */
+  private final CommandXboxController driver =
+      new CommandXboxController(ControlConstants.driverPort);
 
-    /* Subsystems */
-    private final Swerve s_Swerve = new Swerve();
+  /* Subsystems */
+  private final Swerve s_Swerve = new Swerve();
 
+  /** The container for the robot. Contains subsystems, OI devices, and commands. */
+  public RobotContainer() {
+    s_Swerve.setDefaultCommand(
+        s_Swerve.driveFieldRelativeCmd(
+            () -> applyDeadband(-driver.getLeftY(), ControlConstants.stickDeadband),
+            () -> applyDeadband(-driver.getLeftX(), ControlConstants.stickDeadband),
+            () -> applyDeadband(-driver.getRightX(), ControlConstants.stickDeadband)));
 
-    /** The container for the robot. Contains subsystems, OI devices, and commands. */
-    public RobotContainer() {
-        s_Swerve.setDefaultCommand(
-            s_Swerve.driveFieldRelativeCmd(
-                () -> applyDeadband(-driver.getLeftY(), ControlConstants.stickDeadband), 
-                () -> applyDeadband(-driver.getLeftX(), ControlConstants.stickDeadband), 
-                () -> applyDeadband(-driver.getRightX(), ControlConstants.stickDeadband))
-        );
+    // Configure the button bindings
+    configureBindings();
+  }
 
-        // Configure the button bindings
-        configureBindings();
-    }
-
-    /**
+  /**
    * Use this method to define your trigger->command mappings. Triggers can be created via the
    * {@link Trigger#Trigger(java.util.function.BooleanSupplier)} constructor with an arbitrary
    * predicate, or via the named factories in {@link
@@ -45,19 +43,19 @@ public class RobotContainer {
    * CommandXboxController Xbox}/{@link edu.wpi.first.wpilibj2.command.button.CommandPS4Controller
    * PS4} controllers or {@link edu.wpi.first.wpilibj2.command.button.CommandJoystick Flight
    * joysticks}.
-     */
-    private void configureBindings() {
-        /* Driver Buttons */
-        driver.x().onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
-    }
+   */
+  private void configureBindings() {
+    /* Driver Buttons */
+    driver.x().onTrue(new InstantCommand(() -> s_Swerve.zeroHeading()));
+  }
 
-    /**
-     * Use this to pass the autonomous command to the main {@link Robot} class.
-     *
-     * @return the command to run in autonomous
-     */
-    public Command getAutonomousCommand() {
-        // An ExampleCommand will run in autonomous
-        return new exampleAuto(s_Swerve);
-    }
+  /**
+   * Use this to pass the autonomous command to the main {@link Robot} class.
+   *
+   * @return the command to run in autonomous
+   */
+  public Command getAutonomousCommand() {
+    // An ExampleCommand will run in autonomous
+    return new exampleAuto(s_Swerve);
+  }
 }
