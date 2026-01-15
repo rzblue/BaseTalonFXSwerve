@@ -12,9 +12,14 @@ import edu.wpi.first.math.util.Units;
 import frc.lib.util.SwerveModuleConstants;
 
 public final class Constants {
-    public static final double stickDeadband = 0.04;
 
-    public static final class Swerve {
+    public static final class ControlConstants {
+        public static final int driverPort = 0;
+        public static final double stickDeadband = 0.04;
+        
+    }
+
+    public static final class SwerveConstants {
         public static final int pigeonID = 1;
 
         /** Drive motor rotations per rotation of azimuth */

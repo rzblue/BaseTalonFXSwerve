@@ -7,13 +7,13 @@ import com.ctre.phoenix6.controls.PositionVoltage;
 import com.ctre.phoenix6.controls.VelocityVoltage;
 import com.ctre.phoenix6.hardware.CANcoder;
 import com.ctre.phoenix6.hardware.TalonFX;
-
 import edu.wpi.first.math.MathUtil;
 import edu.wpi.first.math.geometry.Rotation2d;
 import edu.wpi.first.math.kinematics.SwerveModulePosition;
 import edu.wpi.first.math.kinematics.SwerveModuleState;
 import frc.lib.math.Conversions;
 import frc.lib.util.SwerveModuleConstants;
+import static frc.robot.Constants.SwerveConstants;
 
 public class SwerveModule {
     public int moduleNumber;
@@ -47,75 +47,86 @@ public class SwerveModule {
         mDriveMotor = new TalonFX(moduleConstants.driveMotorID());
         mDriveMotor.getConfigurator().apply(getDriveMotorConfig());
         mDriveMotor.getConfigurator().setPosition(0.0);
+
+    angleEncoder.getAbsolutePosition().setUpdateFrequency(100);
+    angleEncoder.optimizeBusUtilization();
+
+    mDriveMotor.getVelocity().setUpdateFrequency(100);
+    mDriveMotor.getPosition().setUpdateFrequency(100);
+    mDriveMotor.getMotorVoltage().setUpdateFrequency(100);
+    mDriveMotor.optimizeBusUtilization();
+    mAngleMotor.getVelocity().setUpdateFrequency(100);
+    mAngleMotor.getPosition().setUpdateFrequency(100);
+    mAngleMotor.optimizeBusUtilization();
     }
 
     private TalonFXConfiguration getDriveMotorConfig() {
         var config = new TalonFXConfiguration();
         /* Motor Inverts and Neutral Mode */
-        config.MotorOutput.Inverted = Constants.Swerve.driveMotorInvert;
-        config.MotorOutput.NeutralMode = Constants.Swerve.driveNeutralMode;
+        config.MotorOutput.Inverted = SwerveConstants.driveMotorInvert;
+        config.MotorOutput.NeutralMode = SwerveConstants.driveNeutralMode;
 
         /* Gear Ratio Config */
-        //swerveDriveFXConfig.Feedback.SensorToMechanismRatio = Constants.Swerve.driveGearRatio;
+        //swerveDriveFXConfig.Feedback.SensorToMechanismRatio = SwerveConstants.driveGearRatio;
 
         /* Current Limiting */
-        config.CurrentLimits.SupplyCurrentLimitEnable = Constants.Swerve.driveEnableSupplyCurrentLimit;
-        config.CurrentLimits.SupplyCurrentLimit = Constants.Swerve.driveSupplyCurrentLimit;
-        config.CurrentLimits.SupplyCurrentLowerLimit = Constants.Swerve.driveSupplyCurrentLower;
-        config.CurrentLimits.SupplyCurrentLowerTime = Constants.Swerve.driveSupplyCurrentLowerTime;
+        config.CurrentLimits.SupplyCurrentLimitEnable = SwerveConstants.driveEnableSupplyCurrentLimit;
+        config.CurrentLimits.SupplyCurrentLimit = SwerveConstants.driveSupplyCurrentLimit;
+        config.CurrentLimits.SupplyCurrentLowerLimit = SwerveConstants.driveSupplyCurrentLower;
+        config.CurrentLimits.SupplyCurrentLowerTime = SwerveConstants.driveSupplyCurrentLowerTime;
 
-        config.CurrentLimits.StatorCurrentLimit = Constants.Swerve.driveStatorCurrentLimit;
-        config.CurrentLimits.StatorCurrentLimitEnable = Constants.Swerve.driveEnableStatorCurrentLimit;
+        config.CurrentLimits.StatorCurrentLimit = SwerveConstants.driveStatorCurrentLimit;
+        config.CurrentLimits.StatorCurrentLimitEnable = SwerveConstants.driveEnableStatorCurrentLimit;
 
         /* PID Config */
-        config.Slot0.kP = Constants.Swerve.driveKP;
-        config.Slot0.kI = Constants.Swerve.driveKI;
-        config.Slot0.kD = Constants.Swerve.driveKD;
+        config.Slot0.kP = SwerveConstants.driveKP;
+        config.Slot0.kI = SwerveConstants.driveKI;
+        config.Slot0.kD = SwerveConstants.driveKD;
 
-        config.Slot0.kS = Constants.Swerve.driveKS;
+        config.Slot0.kS = SwerveConstants.driveKS;
         // VS/m * m/r_w / (r_m/r_w) = VS/r_m
-        config.Slot0.kA = Constants.Swerve.driveKA * Conversions.rotationsToMeters(1, Constants.Swerve.wheelCircumference) / Constants.Swerve.driveGearRatio;
-        config.Slot0.kV = Constants.Swerve.driveKV * Conversions.rotationsToMeters(1, Constants.Swerve.wheelCircumference) / Constants.Swerve.driveGearRatio;
+        config.Slot0.kA = SwerveConstants.driveKA * Conversions.rotationsToMeters(1, SwerveConstants.wheelCircumference) / SwerveConstants.driveGearRatio;
+        config.Slot0.kV = SwerveConstants.driveKV * Conversions.rotationsToMeters(1, SwerveConstants.wheelCircumference) / SwerveConstants.driveGearRatio;
 
         /* Open and Closed Loop Ramping */
-        config.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = Constants.Swerve.openLoopRamp;
-        config.OpenLoopRamps.VoltageOpenLoopRampPeriod = Constants.Swerve.openLoopRamp;
+        config.OpenLoopRamps.DutyCycleOpenLoopRampPeriod = SwerveConstants.openLoopRamp;
+        config.OpenLoopRamps.VoltageOpenLoopRampPeriod = SwerveConstants.openLoopRamp;
 
-        config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = Constants.Swerve.closedLoopRamp;
-        config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = Constants.Swerve.closedLoopRamp;
+        config.ClosedLoopRamps.DutyCycleClosedLoopRampPeriod = SwerveConstants.closedLoopRamp;
+        config.ClosedLoopRamps.VoltageClosedLoopRampPeriod = SwerveConstants.closedLoopRamp;
         return config;
     }
 
     private TalonFXConfiguration getTurnMotorConfig() {
         var config = new TalonFXConfiguration();
         /* Motor Inverts and Neutral Mode */
-        config.MotorOutput.Inverted = Constants.Swerve.angleMotorInvert;
-        config.MotorOutput.NeutralMode = Constants.Swerve.angleNeutralMode;
+        config.MotorOutput.Inverted = SwerveConstants.angleMotorInvert;
+        config.MotorOutput.NeutralMode = SwerveConstants.angleNeutralMode;
 
         /* Gear Ratio and Wrapping Config */
-        config.Feedback.SensorToMechanismRatio = Constants.Swerve.angleGearRatio;
+        config.Feedback.SensorToMechanismRatio = SwerveConstants.angleGearRatio;
         config.ClosedLoopGeneral.ContinuousWrap = true;
         
         /* Current Limiting */
-        config.CurrentLimits.SupplyCurrentLimitEnable = Constants.Swerve.angleEnableSupplyCurrentLimit;
-        config.CurrentLimits.SupplyCurrentLimit = Constants.Swerve.angleSupplyCurrentLimit;
-        config.CurrentLimits.SupplyCurrentLowerLimit = Constants.Swerve.angleSupplyCurrentLower;
-        config.CurrentLimits.SupplyCurrentLowerTime = Constants.Swerve.angleSupplyCurrentLowerTime;
+        config.CurrentLimits.SupplyCurrentLimitEnable = SwerveConstants.angleEnableSupplyCurrentLimit;
+        config.CurrentLimits.SupplyCurrentLimit = SwerveConstants.angleSupplyCurrentLimit;
+        config.CurrentLimits.SupplyCurrentLowerLimit = SwerveConstants.angleSupplyCurrentLower;
+        config.CurrentLimits.SupplyCurrentLowerTime = SwerveConstants.angleSupplyCurrentLowerTime;
 
-        config.CurrentLimits.StatorCurrentLimit = Constants.Swerve.angleStatorCurrentLimit;
-        config.CurrentLimits.StatorCurrentLimitEnable = Constants.Swerve.angleEnableStatorCurrentLimit;
+        config.CurrentLimits.StatorCurrentLimit = SwerveConstants.angleStatorCurrentLimit;
+        config.CurrentLimits.StatorCurrentLimitEnable = SwerveConstants.angleEnableStatorCurrentLimit;
 
         /* PID Config */
-        config.Slot0.kP = Constants.Swerve.angleKP;
-        config.Slot0.kI = Constants.Swerve.angleKI;
-        config.Slot0.kD = Constants.Swerve.angleKD;
+        config.Slot0.kP = SwerveConstants.angleKP;
+        config.Slot0.kI = SwerveConstants.angleKI;
+        config.Slot0.kD = SwerveConstants.angleKD;
 
         return config;
     }
 
     private CANcoderConfiguration getEncoderConfig() {
         var config = new CANcoderConfiguration();
-        config.MagnetSensor.SensorDirection = Constants.Swerve.cancoderInvert;
+        config.MagnetSensor.SensorDirection = SwerveConstants.cancoderInvert;
         return config;
     }
 
@@ -140,22 +151,27 @@ public class SwerveModule {
     private void setSpeed(double speedMetersPerSecond, boolean isOpenLoop){
         // Convert linear speed of wheel to motor speed
         var requestedVelocityRPS = wheelMeterToMotorRot(speedMetersPerSecond);
-        // Calculate motor velocity required to hold wheel still at the current azimuth velocity
-        // Don't compensate if requested velocity is 0 - just stop the motor
-        double compensationVelocity = 0;
-        if (speedMetersPerSecond != 0) {
-            compensationVelocity =
-                mAngleMotor.getVelocity().getValueAsDouble() * Constants.Swerve.azimuthCouplingRatio;
-        }
+
+        double compensationVelocity = calculateCompensationVelocity(speedMetersPerSecond, mAngleMotor.getVelocity().getValueAsDouble(), SwerveConstants.azimuthCouplingRatio);
         var outputVelocity = requestedVelocityRPS + compensationVelocity;
 
         if (isOpenLoop) {
             driveDutyCycleRequest.Output =
-                outputVelocity / wheelMeterToMotorRot(Constants.Swerve.maxSpeed);
+                outputVelocity / wheelMeterToMotorRot(SwerveConstants.maxSpeed);
             mDriveMotor.setControl(driveDutyCycleRequest);
         } else {
             driveVelocityRequest.Velocity = outputVelocity;
             mDriveMotor.setControl(driveVelocityRequest);
+        }
+    }
+
+    private double calculateCompensationVelocity(double desiredSpeedMetersPerSecond, double currentAngleVelocity, double couplingRatio) {
+        // Calculate motor velocity required to hold wheel still at the current azimuth velocity
+        // Don't compensate if requested velocity is 0 - just stop the motor
+        if (desiredSpeedMetersPerSecond == 0) {
+            return 0;
+        } else {
+            return currentAngleVelocity * couplingRatio;
         }
     }
 
@@ -174,25 +190,32 @@ public class SwerveModule {
 
     public SwerveModuleState getState(){
         return new SwerveModuleState(
-            Conversions.RPSToMPS(mDriveMotor.getVelocity().getValueAsDouble(), Constants.Swerve.wheelCircumference), 
-            getAngle()
-        );
+        motorRotToWheelMeter(mDriveMotor.getVelocity().getValueAsDouble()), getAngle());
     }
 
-    public SwerveModulePosition getPosition(){
-        return new SwerveModulePosition(
-            Conversions.rotationsToMeters(mDriveMotor.getPosition().getValueAsDouble(), Constants.Swerve.wheelCircumference), 
-            Rotation2d.fromRotations(mAngleMotor.getPosition().getValueAsDouble())
-        );
+  public double getVoltage() {
+    return mDriveMotor.getMotorVoltage().getValueAsDouble();
+  }
+
+  public SwerveModulePosition getPosition() {
+    var driveRotations = mDriveMotor.getPosition().getValueAsDouble();
+    // Calculate how many drive rotations were caused by azimuth coupling
+    var azimuthCompensationDistance =
+        getAngle().getRotations() * SwerveConstants.azimuthCouplingRatio;
+    // Subtract the "false" rotations from the recorded rotations to get the rotations that caused
+    // wheel motion
+    var trueDriveRotations = driveRotations - azimuthCompensationDistance;
+
+    return new SwerveModulePosition(motorRotToWheelMeter(trueDriveRotations), getAngle());
     }
 
     public static double wheelMeterToMotorRot(double wheelMeters) {
-        return Conversions.metersToRotations(wheelMeters, Constants.Swerve.wheelCircumference)
-            * Constants.Swerve.driveGearRatio;
+        return Conversions.metersToRotations(wheelMeters, SwerveConstants.wheelCircumference)
+            * SwerveConstants.driveGearRatio;
     }
 
     public static double motorRotToWheelMeter(double motorRot) {
         return Conversions.rotationsToMeters(
-            motorRot / Constants.Swerve.driveGearRatio, Constants.Swerve.wheelCircumference);
+            motorRot / SwerveConstants.driveGearRatio, SwerveConstants.wheelCircumference);
     }
 }
