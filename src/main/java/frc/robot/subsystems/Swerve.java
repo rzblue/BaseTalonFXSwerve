@@ -1,5 +1,7 @@
 package frc.robot.subsystems;
 
+import static frc.robot.Constants.SwerveConstants;
+
 import com.ctre.phoenix6.configs.Pigeon2Configuration;
 import com.ctre.phoenix6.hardware.Pigeon2;
 import com.reduxrobotics.sensors.canandgyro.Canandgyro;
@@ -47,33 +49,35 @@ public class Swerve extends SubsystemBase {
             Constants.SwerveConstants.swerveKinematics,
             getGyroYaw(),
             getModulePositions(),
-            new Pose2d(new Translation2d(), Rotation2d.fromDegrees(180)),
+            SwerveConstants.initialPose,
             VecBuilder.fill(0.1, 0.1, 0.1),
             VecBuilder.fill(0.3, 0.3, Units.degreesToRadians(45)));
   }
 
   public void drive(
       Translation2d translation, double rotation, boolean fieldRelative, boolean isOpenLoop) {
-    SwerveModuleState[] swerveModuleStates =
-        Constants.SwerveConstants.swerveKinematics.toSwerveModuleStates(
-            fieldRelative
-                ? ChassisSpeeds.fromFieldRelativeSpeeds(
-                    translation.getX(), translation.getY(), rotation, getHeading())
-                : new ChassisSpeeds(translation.getX(), translation.getY(), rotation));
-    SwerveDriveKinematics.desaturateWheelSpeeds(
-        swerveModuleStates, Constants.SwerveConstants.maxSpeed);
 
-    for (SwerveModule mod : swerveMods) {
-      mod.setDesiredState(swerveModuleStates[mod.moduleNumber], isOpenLoop);
+    ChassisSpeeds robotRelativeChassisSpeeds;
+    if (fieldRelative) {
+      robotRelativeChassisSpeeds =
+          ChassisSpeeds.fromFieldRelativeSpeeds(
+              translation.getX(), translation.getY(), rotation, getHeading());
+    } else {
+      robotRelativeChassisSpeeds =
+          new ChassisSpeeds(translation.getX(), translation.getY(), rotation);
     }
+
+    SwerveModuleState[] swerveModuleStates =
+        SwerveConstants.swerveKinematics.toSwerveModuleStates(robotRelativeChassisSpeeds);
+
+    setModuleStates(swerveModuleStates, isOpenLoop);
   }
 
-  /* Used by SwerveControllerCommand in Auto */
-  public void setModuleStates(SwerveModuleState[] desiredStates) {
+  public void setModuleStates(SwerveModuleState[] desiredStates, boolean isOpenLoop) {
     SwerveDriveKinematics.desaturateWheelSpeeds(desiredStates, Constants.SwerveConstants.maxSpeed);
 
     for (SwerveModule mod : swerveMods) {
-      mod.setDesiredState(desiredStates[mod.moduleNumber], false);
+      mod.setDesiredState(desiredStates[mod.moduleNumber], isOpenLoop);
     }
   }
 
