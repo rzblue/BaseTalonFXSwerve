@@ -142,7 +142,7 @@ public class Swerve extends SubsystemBase {
               new Translation2d(translationVal, strafeVal)
                   .times(Constants.SwerveConstants.maxSpeed),
               rotationVal * Constants.SwerveConstants.maxAngularVelocity,
-              false,
+              true,
               true);
         });
   }
